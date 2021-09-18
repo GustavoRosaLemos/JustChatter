@@ -1,4 +1,5 @@
-from flask import Flask
+from routes.chat.chat import loadChatRoutes
+from flask import Flask, app
 from flask_socketio import SocketIO
 import os
 
@@ -8,6 +9,8 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 socketio = SocketIO(app)
+
+loadChatRoutes(app)
 
 
 if __name__ == '__main__':
