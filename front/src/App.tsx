@@ -4,24 +4,20 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './shared/components/Header';
+import { Provider } from 'react-redux';
+import store from './store';
+import { Route, Router, Switch } from 'react-router-dom';
+import history from './shared/history';
 
 const App = (): JSX.Element => {
   return (
-    <>
-      <Header />
-      <AuthenticatedRoutes />
-      <ToastContainer
-        position="bottom-left"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-    </>
+    <Provider store={store}>
+      <Router history={history}>
+        <Switch>
+          <Route path="/" component={AuthenticatedRoutes} />
+        </Switch>
+      </Router>
+    </Provider>
   );
 };
 
