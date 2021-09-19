@@ -10,7 +10,7 @@ export const AuthenticatedRoutes = (): JSX.Element => {
     <>
       <Header />
       <Switch>
-        <Route path="/chat" exact component={chatPage} />
+        <Route path="/chat/:roomId" exact component={chatPage} />
         <Route path="/" component={chatSelectionPage} />
       </Switch>
       <ToastContainer

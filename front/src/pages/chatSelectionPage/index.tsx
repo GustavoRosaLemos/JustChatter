@@ -6,6 +6,7 @@ import { useGetRooms, useRooms } from '../../store/hooks/roomHooks';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { sendError } from '../../utils/notify';
 import './styles.scss';
+import history from '../../shared/history';
 
 const chatSelectionPage = (): JSX.Element => {
   const isLoading = useIsLoading();
@@ -15,7 +16,7 @@ const chatSelectionPage = (): JSX.Element => {
   const rooms = useRooms();
 
   const handleSelectChat = (roomId: string) => {
-    console.log(roomId);
+    history.push(`/chat/${roomId}`);
   };
 
   const handleFetchData = useCallback(async () => {
