@@ -1,15 +1,21 @@
 import React, { useCallback, useEffect } from 'react';
-import { Container, Card, Button } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
+import RoomCard from './Card';
+import { useHideLoading, useIsLoading, useShowLoading } from '../../store/hooks/loadingHooks';
 import { useGetRooms, useRooms } from '../../store/hooks/roomHooks';
+import ClipLoader from 'react-spinners/ClipLoader';
 import { sendError } from '../../utils/notify';
 import './styles.scss';
 
 const chatSelectionPage = (): JSX.Element => {
+  const isLoading = useIsLoading();
+  const showLoading = useShowLoading();
+  const hideLoading = useHideLoading();
   const getRooms = useGetRooms();
   const rooms = useRooms();
 
-  const handleSelectChat = () => {
-    console.log('entrando no chat!');
+  const handleSelectChat = (roomId: string) => {
+    console.log(roomId);
   };
 
   const handleFetchData = useCallback(async () => {
@@ -19,27 +25,39 @@ const chatSelectionPage = (): JSX.Element => {
       if (error instanceof Error) {
         sendError(error.message);
       }
+    } finally {
+      hideLoading();
     }
-    console.log('ROOMS', rooms);
   }, []);
 
   useEffect(() => {
+    showLoading();
     handleFetchData();
   }, [handleFetchData]);
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center" style={{ marginTop: '30vh' }}>
+        <ClipLoader color="#0d6efd" loading={isLoading} size={100} speedMultiplier={0.5} />
+      </div>
+    );
+  }
+
   return (
-    <Container fluid style={{ marginTop: '20px' }} className="d-flex">
-      {rooms &&
-        rooms?.map((room) => (
-          <Card className="card" key={room._id}>
-            <Card.Body>
-              <Card.Title>{room.name}</Card.Title>
-              <Card.Text>{room.description}</Card.Text>
-              <Button variant="primary" onClick={handleSelectChat}>
-                Entrar
-              </Button>
-            </Card.Body>
-          </Card>
-        ))}
+    <Container fluid style={{ marginTop: '20px' }} className="d-flex justify-content-center">
+      {rooms ? (
+        rooms.map((room) => (
+          <RoomCard
+            key={room._id}
+            id={room._id}
+            title={room.name}
+            description={room.description}
+            onClick={handleSelectChat}
+          />
+        ))
+      ) : (
+        <div>Não há salas!</div>
+      )}
     </Container>
   );
 };

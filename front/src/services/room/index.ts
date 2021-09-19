@@ -10,9 +10,7 @@ export const requestRoomData = async (roomId: string) => {
 
 export const requestRoomsData = async () => {
   const url = `http://localhost:8080/api/v1/justchatter/chat/rooms`;
-  console.log(url);
   const headers = { 'content-type': 'application/json' };
   const response = await requestService(url, {}, headers, 'GET');
-  console.log(response);
-  return response;
+  return response.content;
 };
