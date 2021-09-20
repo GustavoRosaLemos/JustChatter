@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, FormControl, InputGroup } from 'react-bootstrap';
 import { ChatMessage } from '../../../shared/@types/chat';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,6 +15,14 @@ const ChatTools = ({ sendMessage, roomId }: ChatToolsProps) => {
     setContent('');
   };
 
+  useEffect(() => {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('chatSubmit')?.click();
+      }
+    });
+  }, []);
+
   return (
     <div className="m-2">
       <InputGroup>
@@ -27,6 +35,7 @@ const ChatTools = ({ sendMessage, roomId }: ChatToolsProps) => {
           onChange={(e) => setContent(e.target.value)}
         />
         <Button
+          id="chatSubmit"
           className="btn btn-primary"
           style={{ height: '50px' }}
           onClick={() => {

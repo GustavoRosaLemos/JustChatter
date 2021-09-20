@@ -55,10 +55,12 @@ const chatPage = () => {
   useEffect(() => {
     if (socket) {
       socket.on('broadcastMessage', (message) => {
-        const messagestemp = messages;
-        setMessages([]);
-        messagestemp.push(message);
-        setMessages(messagestemp);
+        if (message.roomId === roomId) {
+          const messagestemp = messages;
+          setMessages([]);
+          messagestemp.push(message);
+          setMessages(messagestemp);
+        }
       });
     }
   }, [socket]);
