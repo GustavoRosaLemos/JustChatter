@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Col } from 'react-bootstrap';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import Chat from './Chat';
 import SideList from '../../shared/components/SideList';
 import { useHideLoading, useIsLoading, useShowLoading } from '../../store/hooks/loadingHooks';
@@ -10,30 +10,34 @@ import history from '../../shared/history';
 import { sendError, sendSucess } from '../../utils/notify';
 import { ChatMessage } from '../../shared/@types/chat';
 import ClipLoader from 'react-spinners/ClipLoader';
+import { useGetSocket, useSocket } from '../../store/hooks/socketHooks';
 
 interface ParamsType {
   roomId: string;
 }
 
 const chatPage = () => {
-  const [socket, setSocket] = useState<Socket>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const isLoading = useIsLoading();
+  const getSocket = useGetSocket();
+  const socket = useSocket();
   const showLoading = useShowLoading();
   const hideLoading = useHideLoading();
   const roomId = useParams<ParamsType>().roomId;
 
   const handleFetch = useCallback(() => {
     if (!socket) {
-      const socketio = io('http://localhost:8080/');
-      if (socketio.active) {
+      try {
+        getSocket();
+      } catch (error) {
+        if (error instanceof Error) {
+          sendError('Falha ao conectar com o chat!');
+        }
+        history.push('/');
+      } finally {
         sendSucess('Chat conectado!');
         hideLoading();
-      } else {
-        sendError('Falha ao conectar com o chat!');
-        history.push('/');
       }
-      setSocket(socketio);
     }
   }, []);
 
