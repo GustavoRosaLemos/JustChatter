@@ -17,4 +17,4 @@ def loadChatSockets(socket) -> None:
     @socket.on('chatMessage')
     def sendMessage(message):
         print('message send: ' + message['content'])
-        socket.emit('refreshMessage', message)
+        socket.emit('broadcastMessage', message, broadcast=True)

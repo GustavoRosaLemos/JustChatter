@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Col } from 'react-bootstrap';
 import { io, Socket } from 'socket.io-client';
 import Chat from './Chat';
 import SideList from '../../shared/components/SideList';
 import { useHideLoading, useIsLoading, useShowLoading } from '../../store/hooks/loadingHooks';
 import ChatTools from './ChatTools';
-import { DefaultEventsMap } from 'socket.io-client/build/typed-events';
 import { useParams } from 'react-router';
 import history from '../../shared/history';
 import { sendError, sendSucess } from '../../utils/notify';
@@ -17,49 +16,26 @@ interface ParamsType {
 }
 
 const chatPage = () => {
-  const [socket, setSocket] = useState<Socket<DefaultEventsMap> | undefined>(undefined);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      type: 'message',
-      roomId: '614638c098158943e6d074f9',
-      sender: 'Gustavo',
-      content: 'teste',
-      key: 'njdkawjndkwjadn',
-    },
-  ]);
+  const [socket, setSocket] = useState<Socket>();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const isLoading = useIsLoading();
   const showLoading = useShowLoading();
   const hideLoading = useHideLoading();
   const roomId = useParams<ParamsType>().roomId;
 
-  const handleConnect = useCallback(() => {
-    if (socket) {
-      if (roomId) {
-        socket.emit('joinedChat', roomId);
-        sendSucess('Conectado ao chat!');
+  const handleFetch = useCallback(() => {
+    if (!socket) {
+      const socketio = io('http://localhost:8080/');
+      if (socketio.active) {
+        sendSucess('Chat conectado!');
         hideLoading();
       } else {
-        sendError('Falha ao localizar o chat!');
+        sendError('Falha ao conectar com o chat!');
         history.push('/');
       }
-    } else {
-      setSocket(io('http://localhost:8080/'));
+      setSocket(socketio);
     }
-  }, [socket]);
-
-  const handleReceiveMessages = useCallback(async () => {
-    if (socket) {
-      socket.on('refreshMessage', (message: ChatMessage) => {
-        if (message.roomId == roomId) {
-          const messagesReceived = messages;
-          messagesReceived.push(message);
-          setMessages(messagesReceived);
-        }
-        console.log('message received');
-        console.log(messages);
-      });
-    }
-  }, [socket]);
+  }, []);
 
   const handleSendMessage = (message: ChatMessage) => {
     if (socket) {
@@ -73,14 +49,24 @@ const chatPage = () => {
   };
 
   useEffect(() => {
+    if (socket) {
+      socket.on('broadcastMessage', (message) => {
+        const messagestemp = messages;
+        setMessages([]);
+        messagestemp.push(message);
+        setMessages(messagestemp);
+      });
+    }
+  }, [socket]);
+
+  useEffect(() => {
     showLoading();
     if (!roomId) {
       sendError('Falha ao localizar o chat!');
       history.push('/');
     }
-    handleConnect();
-    handleReceiveMessages();
-  }, [handleConnect, handleReceiveMessages]);
+    handleFetch();
+  }, [handleFetch]);
 
   if (isLoading) {
     return (

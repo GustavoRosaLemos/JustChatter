@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Col } from 'react-bootstrap';
 import { ChatMessage } from '../../../shared/@types/chat';
+import { v4 as uuidv4 } from 'uuid';
 import './styles.scss';
 
 interface ChatProps {
