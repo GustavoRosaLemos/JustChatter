@@ -1,3 +1,4 @@
+from utils.utils import tokenRequired
 from controllers.chatController import findChatRoom
 from controllers.chatController import findChatRooms
 import os
