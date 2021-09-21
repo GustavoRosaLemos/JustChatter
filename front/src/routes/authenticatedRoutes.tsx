@@ -5,13 +5,13 @@ import chatPage from '../pages/chatPage';
 import chatSelectionPage from '../pages/chatSelectionPage';
 import Header from '../shared/components/Header';
 
-export const AuthenticatedRoutes = (): JSX.Element => {
+const AuthenticatedRoutes = (): JSX.Element => {
   return (
     <>
       <Header />
       <Switch>
         <Route path="/chat/:roomId" exact component={chatPage} />
-        <Route path="/" component={chatSelectionPage} />
+        <Route path="/" exact component={chatSelectionPage} />
       </Switch>
       <ToastContainer
         position="bottom-left"
