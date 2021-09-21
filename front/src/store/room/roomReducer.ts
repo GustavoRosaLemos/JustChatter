@@ -1,5 +1,5 @@
 import { Room } from '../../shared/@types/room';
-import * as roomAction from '../room/roomAction';
+import * as roomActions from '../room/roomAction';
 
 export interface State {
   room?: Room;
@@ -11,18 +11,18 @@ const INITIAL_STATE: State = {
   rooms: undefined,
 };
 
-export type Actions = roomAction.GetRoom | roomAction.GetRooms;
+export type Actions = roomActions.GetRoom | roomActions.GetRooms;
 
 export const roomReducer = (state = INITIAL_STATE, action: Actions): State => {
   switch (action.type) {
-    case roomAction.GET_ROOM: {
+    case roomActions.GET_ROOM: {
       const { room } = action.payload;
       return {
         ...state,
         room,
       };
     }
-    case roomAction.GET_ROOMS: {
+    case roomActions.GET_ROOMS: {
       const { rooms } = action.payload;
       return {
         ...state,
