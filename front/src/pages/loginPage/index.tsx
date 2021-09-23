@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Container, Form, Button, Row } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import { FormLogin } from '../../shared/@types/login';
@@ -45,6 +45,10 @@ const LoginPage = (): JSX.Element => {
   });
 
   const { values, resetForm, handleChange, touched, errors } = formik;
+
+  useEffect(() => {
+    clearSessionParams();
+  }, []);
 
   const handleSubmit = async (values: FormLogin) => {
     showLoading();

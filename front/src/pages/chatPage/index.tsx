@@ -10,6 +10,7 @@ import { sendError, sendSucess } from '../../utils/notify';
 import { ChatMessage } from '../../shared/@types/chat';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { useGetSocket, useSocket } from '../../store/hooks/socketHooks';
+import { useGetUser, useUser } from '../../store/hooks/userHooks';
 
 interface ParamsType {
   roomId: string;
@@ -17,6 +18,8 @@ interface ParamsType {
 
 const chatPage = (): JSX.Element => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const getUser = useGetUser();
+  const user = useUser();
   const isLoading = useIsLoading();
   const getSocket = useGetSocket();
   const socket = useSocket();
@@ -51,7 +54,19 @@ const chatPage = (): JSX.Element => {
     }
   };
 
+  const handleGetUserData = useCallback(async () => {
+    try {
+      await getUser();
+    } catch {
+      sendError('Falha ao buscar dados da sessão, por favor realize o login novamente!');
+      history.push('/login');
+    }
+  }, []);
+
   useEffect(() => {
+    if (!user) {
+      handleGetUserData();
+    }
     if (socket) {
       socket.on('broadcastMessage', (message) => {
         if (message.roomId === roomId) {
@@ -62,7 +77,7 @@ const chatPage = (): JSX.Element => {
         }
       });
     }
-  }, [socket]);
+  }, [socket, user]);
 
   useEffect(() => {
     showLoading();
@@ -89,7 +104,7 @@ const chatPage = (): JSX.Element => {
             <Chat messages={messages} />
           </div>
           <div style={{ height: '10%' }}>
-            <ChatTools sendMessage={handleSendMessage} roomId={roomId} />
+            <ChatTools sendMessage={handleSendMessage} roomId={roomId} user={user} />
           </div>
         </div>
         <div className="d-flex justify-content-center sideListBox" style={{ width: '100%' }}>
