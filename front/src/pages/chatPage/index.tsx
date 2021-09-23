@@ -28,20 +28,21 @@ const chatPage = (): JSX.Element => {
   const roomId = useParams<ParamsType>().roomId;
 
   const handleFetch = useCallback(() => {
-    if (!socket) {
+    if (!socket && user) {
+      showLoading();
       try {
         getSocket();
       } catch (error) {
         if (error instanceof Error) {
           sendError('Falha ao conectar com o chat!');
         }
+        hideLoading();
         history.push('/');
       } finally {
-        sendSucess('Chat conectado!');
         hideLoading();
       }
     }
-  }, []);
+  }, [user]);
 
   const handleSendMessage = (message: ChatMessage) => {
     if (socket) {
@@ -50,6 +51,7 @@ const chatPage = (): JSX.Element => {
       }
     } else {
       sendError('Falha ao conectar com o chat!');
+      hideLoading();
       history.push('/');
     }
   };
@@ -59,14 +61,12 @@ const chatPage = (): JSX.Element => {
       await getUser();
     } catch {
       sendError('Falha ao buscar dados da sessão, por favor realize o login novamente!');
+      hideLoading();
       history.push('/login');
     }
   }, []);
 
   useEffect(() => {
-    if (!user) {
-      handleGetUserData();
-    }
     if (socket) {
       socket.on('broadcastMessage', (message) => {
         if (message.roomId === roomId) {
@@ -77,12 +77,18 @@ const chatPage = (): JSX.Element => {
         }
       });
     }
-  }, [socket, user]);
+  }, [socket]);
 
   useEffect(() => {
-    showLoading();
+    if (!user) {
+      handleGetUserData();
+    }
+  }, [handleGetUserData, user]);
+
+  useEffect(() => {
     if (!roomId) {
       sendError('Falha ao localizar o chat!');
+      hideLoading();
       history.push('/');
     }
     handleFetch();
