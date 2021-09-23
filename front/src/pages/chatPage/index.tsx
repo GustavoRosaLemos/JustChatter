@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Col } from 'react-bootstrap';
-import { Socket } from 'socket.io-client';
 import Chat from './Chat';
 import SideList from '../../shared/components/SideList';
 import { useHideLoading, useIsLoading, useShowLoading } from '../../store/hooks/loadingHooks';
@@ -16,7 +15,7 @@ interface ParamsType {
   roomId: string;
 }
 
-const chatPage = () => {
+const chatPage = (): JSX.Element => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const isLoading = useIsLoading();
   const getSocket = useGetSocket();

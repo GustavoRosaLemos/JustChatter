@@ -25,7 +25,7 @@ def loginUser(data) -> dict:
         return dict(message=invalidMessage, code=400, content=None), 400
     if(not decrypt(result[1]['password']) == data['password']):
         del result[1]['password']
-        return dict(mesage="A senha inserida é inválida!", code=400, content=None), 400
+        return dict(message="A senha inserida é inválida!", code=400, content=None), 400
     del result[1]['password']
     result[1]['token'] = genereateSessionToken(result[1])
     return dict(message="Login realizado com sucesso!", code=200, content=result[1]), 200

@@ -8,7 +8,7 @@ interface ChatToolsProps {
   roomId: string;
 }
 
-const ChatTools = ({ sendMessage, roomId }: ChatToolsProps) => {
+const ChatTools = ({ sendMessage, roomId }: ChatToolsProps): JSX.Element => {
   const [content, setContent] = useState('');
 
   const handleResetChatInput = () => {
