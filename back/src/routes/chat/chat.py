@@ -1,6 +1,7 @@
+from controllers.socketController import joinControl, messageControl, typingControl, exitControl
+from controllers.chatController import findChatRoom, findChatRooms
+from werkzeug.wrappers import request
 from utils.utils import tokenRequired
-from controllers.chatController import findChatRoom
-from controllers.chatController import findChatRooms
 import os
 
 def loadChatRoutes(app) -> None:
@@ -12,10 +13,19 @@ def loadChatRoutes(app) -> None:
 
 def loadChatSockets(socket) -> None:
     @socket.on('joinedChat')
-    def joined(roomId):
-        print('user conneted to: ' + roomId)
+    def joined(data: dict):
+        joinControl(socket, data)
 
     @socket.on('chatMessage')
     def sendMessage(message):
-        print('message send: ' + message['content'])
-        socket.emit('broadcastMessage', message, broadcast=True)
+        messageControl(socket, message)
+
+    @socket.on('Typing')
+    def Typing(data):
+        typingControl(socket, data)
+
+    @socket.on('disconnect')
+    def diconnect():
+        exitControl(socket)
+       
+

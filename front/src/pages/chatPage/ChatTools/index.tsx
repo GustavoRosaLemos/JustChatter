@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Button, FormControl, InputGroup } from 'react-bootstrap';
-import { ChatMessage } from '../../../shared/@types/chat';
+import { ChatMessage, ChatTyping } from '../../../shared/@types/chat';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../../../shared/@types/user';
 
 interface ChatToolsProps {
   sendMessage: (msg: ChatMessage) => void;
+  sendTyping: (data: ChatTyping) => void;
   roomId: string;
   user?: User;
 }
 
-const ChatTools = ({ sendMessage, roomId, user }: ChatToolsProps): JSX.Element => {
+const ChatTools = ({ sendMessage, sendTyping, roomId, user }: ChatToolsProps): JSX.Element => {
   const [content, setContent] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   const handleResetChatInput = () => {
     setContent('');
+    sendTyping({ roomId: roomId, type: 'stop', username: user?.username ?? '', key: user?._id ?? uuidv4() });
+    setIsTyping(false);
   };
 
   useEffect(() => {
@@ -24,6 +28,22 @@ const ChatTools = ({ sendMessage, roomId, user }: ChatToolsProps): JSX.Element =
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (content !== '' && !isTyping) {
+      sendTyping({ roomId: roomId, type: 'start', username: user?.username ?? '', key: user?._id ?? uuidv4() });
+      setIsTyping(true);
+      setTimeout(() => {
+        if (isTyping) {
+          sendTyping({ roomId: roomId, type: 'stop', username: user?.username ?? '', key: user?._id ?? uuidv4() });
+          setIsTyping(false);
+        }
+      }, 10000);
+    } else if (content === '' && isTyping) {
+      sendTyping({ roomId: roomId, type: 'stop', username: user?.username ?? '', key: user?._id ?? uuidv4() });
+      setIsTyping(false);
+    }
+  }, [content]);
 
   return (
     <div className="m-2">
