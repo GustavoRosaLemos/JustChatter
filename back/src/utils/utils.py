@@ -34,13 +34,11 @@ def generateExpirationTime():
 def genereateToken() -> str:
     expire = generateExpirationTime()
     token = jwt.encode({"exp": expire}, os.getenv('AUTH_KEY'))
-    print(token)
     return token
 
 def genereateSessionToken(user: dict) -> str:
     expire = generateExpirationTime()
     token = jwt.encode({"user": user, "exp": expire}, os.getenv('AUTH_KEY'))
-    print(token)
     return token
 
 def encrypt(content: str) -> str:
