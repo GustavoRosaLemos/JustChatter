@@ -4,16 +4,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Provider } from 'react-redux';
 import store from './store';
-import { Route, Router, Switch } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 import history from './shared/history';
+import NonAuthenticatedRoutes from './routes/nonAuthenticatedRoutes';
 
 const App = (): JSX.Element => {
   return (
     <Provider store={store}>
       <Router history={history}>
-        <Switch>
-          <Route path="/" component={AuthenticatedRoutes} />
-        </Switch>
+        <AuthenticatedRoutes />
+        <NonAuthenticatedRoutes />
       </Router>
     </Provider>
   );

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Button, FormControl, InputGroup } from 'react-bootstrap';
 import { ChatMessage } from '../../../shared/@types/chat';
 import { v4 as uuidv4 } from 'uuid';
+import { User } from '../../../shared/@types/user';
 
 interface ChatToolsProps {
   sendMessage: (msg: ChatMessage) => void;
   roomId: string;
+  user?: User;
 }
 
-const ChatTools = ({ sendMessage, roomId }: ChatToolsProps) => {
+const ChatTools = ({ sendMessage, roomId, user }: ChatToolsProps): JSX.Element => {
   const [content, setContent] = useState('');
 
   const handleResetChatInput = () => {
@@ -42,7 +44,7 @@ const ChatTools = ({ sendMessage, roomId }: ChatToolsProps) => {
             sendMessage({
               type: 'message',
               roomId: roomId,
-              sender: 'Gustavo',
+              sender: user?.username ?? 'Desconhecido',
               content: content,
               key: uuidv4(),
             });

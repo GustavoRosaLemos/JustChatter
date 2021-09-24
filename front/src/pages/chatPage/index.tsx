@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Col } from 'react-bootstrap';
-import { Socket } from 'socket.io-client';
 import Chat from './Chat';
 import SideList from '../../shared/components/SideList';
 import { useHideLoading, useIsLoading, useShowLoading } from '../../store/hooks/loadingHooks';
@@ -11,13 +10,16 @@ import { sendError, sendSucess } from '../../utils/notify';
 import { ChatMessage } from '../../shared/@types/chat';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { useGetSocket, useSocket } from '../../store/hooks/socketHooks';
+import { useGetUser, useUser } from '../../store/hooks/userHooks';
 
 interface ParamsType {
   roomId: string;
 }
 
-const chatPage = () => {
+const chatPage = (): JSX.Element => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const getUser = useGetUser();
+  const user = useUser();
   const isLoading = useIsLoading();
   const getSocket = useGetSocket();
   const socket = useSocket();
@@ -26,20 +28,21 @@ const chatPage = () => {
   const roomId = useParams<ParamsType>().roomId;
 
   const handleFetch = useCallback(() => {
-    if (!socket) {
+    if (!socket && user) {
+      showLoading();
       try {
         getSocket();
       } catch (error) {
         if (error instanceof Error) {
           sendError('Falha ao conectar com o chat!');
         }
+        hideLoading();
         history.push('/');
       } finally {
-        sendSucess('Chat conectado!');
         hideLoading();
       }
     }
-  }, []);
+  }, [user]);
 
   const handleSendMessage = (message: ChatMessage) => {
     if (socket) {
@@ -48,9 +51,20 @@ const chatPage = () => {
       }
     } else {
       sendError('Falha ao conectar com o chat!');
+      hideLoading();
       history.push('/');
     }
   };
+
+  const handleGetUserData = useCallback(async () => {
+    try {
+      await getUser();
+    } catch {
+      sendError('Falha ao buscar dados da sessão, por favor realize o login novamente!');
+      hideLoading();
+      history.push('/login');
+    }
+  }, []);
 
   useEffect(() => {
     if (socket) {
@@ -66,9 +80,15 @@ const chatPage = () => {
   }, [socket]);
 
   useEffect(() => {
-    showLoading();
+    if (!user) {
+      handleGetUserData();
+    }
+  }, [handleGetUserData, user]);
+
+  useEffect(() => {
     if (!roomId) {
       sendError('Falha ao localizar o chat!');
+      hideLoading();
       history.push('/');
     }
     handleFetch();
@@ -90,7 +110,7 @@ const chatPage = () => {
             <Chat messages={messages} />
           </div>
           <div style={{ height: '10%' }}>
-            <ChatTools sendMessage={handleSendMessage} roomId={roomId} />
+            <ChatTools sendMessage={handleSendMessage} roomId={roomId} user={user} />
           </div>
         </div>
         <div className="d-flex justify-content-center sideListBox" style={{ width: '100%' }}>
