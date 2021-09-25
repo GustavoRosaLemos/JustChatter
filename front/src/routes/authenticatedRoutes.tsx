@@ -38,12 +38,12 @@ const AuthenticatedRoutes = (): JSX.Element => {
       sendError('Falha ao buscar dados da sessão, por favor realize o login novamente!');
       history.push('/login');
     }
-  }, []);
+  }, [history]);
 
   useEffect(() => {
     handleCheckSession();
     handleGetUserData();
-  }, [handleCheckSession]);
+  }, [handleCheckSession, handleGetUserData, history]);
   return (
     <>
       <Header user={user} />

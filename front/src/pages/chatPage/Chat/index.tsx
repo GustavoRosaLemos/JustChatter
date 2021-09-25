@@ -6,16 +6,17 @@ import './styles.scss';
 interface ChatProps {
   messages: ChatMessage[];
   typingUsers: ChatTyping[];
+  socketId: string;
 }
 
-const Chat = ({ messages, typingUsers }: ChatProps): JSX.Element => {
+const Chat = ({ messages, typingUsers, socketId }: ChatProps): JSX.Element => {
   return (
     <Col className="m-2" style={{ height: '100%' }}>
       <Col style={{ overflowY: 'scroll', wordWrap: 'break-word', height: '97%' }}>
         {messages &&
           messages.map((message) =>
             message.type === 'message' ? (
-              <div className="message" key={message.key}>
+              <div className={socketId === message.socketId ? 'selfMessage' : 'message'} key={message.key}>
                 {`${message.sender}: ${message.content}`}
               </div>
             ) : (

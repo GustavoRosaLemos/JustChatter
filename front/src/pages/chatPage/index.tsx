@@ -6,7 +6,7 @@ import { useHideLoading, useIsLoading, useShowLoading } from '../../store/hooks/
 import ChatTools from './ChatTools';
 import { useParams } from 'react-router';
 import history from '../../shared/history';
-import { sendError } from '../../utils/notify';
+import { sendError, sendInfo } from '../../utils/notify';
 import { ChatMessage, ChatTyping, ChatUser } from '../../shared/@types/chat';
 import ClipLoader from 'react-spinners/ClipLoader';
 import { useGetSocket, useSocket } from '../../store/hooks/socketHooks';
@@ -29,11 +29,12 @@ const chatPage = (): JSX.Element => {
   const hideLoading = useHideLoading();
   const roomId = useParams<ParamsType>().roomId;
 
-  const handleFetch = useCallback(() => {
-    if (!socket && user) {
+  const handleFetch = useCallback(async () => {
+    if (!socket) {
       showLoading();
       try {
-        getSocket();
+        await getUser();
+        await getSocket();
       } catch (error) {
         if (error instanceof Error) {
           sendError('Falha ao conectar com o chat!');
@@ -44,7 +45,7 @@ const chatPage = (): JSX.Element => {
         hideLoading();
       }
     }
-  }, [user, socket]);
+  }, [socket]);
 
   const handleSendMessage = (message: ChatMessage) => {
     if (socket) {
@@ -67,16 +68,6 @@ const chatPage = (): JSX.Element => {
       history.push('/');
     }
   };
-
-  const handleGetUserData = useCallback(async () => {
-    try {
-      await getUser();
-    } catch {
-      sendError('Falha ao buscar dados da sessão, por favor realize o login novamente!');
-      hideLoading();
-      history.push('/login');
-    }
-  }, []);
 
   useEffect(() => {
     if (socket && user) {
@@ -107,17 +98,15 @@ const chatPage = (): JSX.Element => {
             userList.push(item);
           }
         });
-        console.log(userList);
         setConnectedUsers(userList);
+      });
+      socket.on('forceDisconnect', () => {
+        sendInfo('Você foi desconectado do chat, pois já está conectado em outra aba!');
+        history.push('/');
+        socket.disconnect();
       });
     }
   }, [socket, user]);
-
-  useEffect(() => {
-    if (!user) {
-      handleGetUserData();
-    }
-  }, [handleGetUserData, user]);
 
   useEffect(() => {
     if (!roomId) {
@@ -141,10 +130,16 @@ const chatPage = (): JSX.Element => {
       <div className="d-flex justify-content-between" style={{ height: '100%' }}>
         <div className="d-flex flex-column justify-content-between col-md-10" style={{ backgroundColor: '#F7F7F7' }}>
           <div style={{ height: '100%', maxHeight: '83vh' }}>
-            <Chat messages={messages} typingUsers={typingUsers} />
+            <Chat messages={messages} typingUsers={typingUsers} socketId={socket?.id ?? ''} />
           </div>
           <div style={{ height: '10%' }}>
-            <ChatTools sendMessage={handleSendMessage} sendTyping={handleSendTyping} roomId={roomId} user={user} />
+            <ChatTools
+              sendMessage={handleSendMessage}
+              sendTyping={handleSendTyping}
+              roomId={roomId}
+              user={user}
+              socketId={socket?.id ?? ''}
+            />
           </div>
         </div>
         <div className="d-flex justify-content-center sideListBox" style={{ width: '100%' }}>

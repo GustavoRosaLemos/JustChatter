@@ -9,11 +9,13 @@ import * as Yup from 'yup';
 import { useHideLoading, useIsLoading, useShowLoading } from '../../store/hooks/loadingHooks';
 import ClipLoader from 'react-spinners/ClipLoader';
 import history from '../../shared/history';
+import { useGetUser } from '../../store/hooks/userHooks';
 
 const LoginPage = (): JSX.Element => {
   const [resgisterMode, setRegisterMode] = useState(false);
   const requestRegister = useRequestRegister();
   const requestLogin = useRequestLogin();
+  const getUser = useGetUser();
   const isLoading = useIsLoading();
   const showLoading = useShowLoading();
   const hideLoading = useHideLoading();
@@ -44,6 +46,15 @@ const LoginPage = (): JSX.Element => {
     validationSchema: validation,
   });
 
+  const handleGetUserData = async () => {
+    try {
+      await getUser();
+    } catch {
+      sendError('Falha ao buscar dados da sessão, por favor realize o login novamente!');
+      history.push('/login');
+    }
+  };
+
   const { values, resetForm, handleChange, touched, errors } = formik;
 
   useEffect(() => {
@@ -66,6 +77,7 @@ const LoginPage = (): JSX.Element => {
             saveSessionParam('token', response.token);
             resetForm();
             hideLoading();
+            handleGetUserData();
             history.push('/');
             sendSucess('Registro realizado com sucesso!');
           } else {
@@ -99,6 +111,7 @@ const LoginPage = (): JSX.Element => {
           saveSessionParam('token', response.token);
           resetForm();
           hideLoading();
+          handleGetUserData();
           history.push('/');
           sendSucess('Login realizado com sucesso!');
         } catch (error) {
