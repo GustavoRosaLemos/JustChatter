@@ -3,6 +3,7 @@ import { User } from './user';
 export interface ChatMessage {
   type: string;
   roomId: string;
+  socketId: string;
   sender: string;
   content: string;
   key: string;

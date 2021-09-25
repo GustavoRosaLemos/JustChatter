@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { requestLogin, requestRegister, requestTokenValidation } from '../../services/login';
-import { LoginData, RegisterData } from '../../shared/@types/login';
+import { LoginData, LoginResponse, RegisterData } from '../../shared/@types/login';
 
 export const useRequestLogin = () =>
   useCallback(async (login: LoginData) => {

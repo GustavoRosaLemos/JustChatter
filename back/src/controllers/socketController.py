@@ -1,18 +1,18 @@
 from flask import request
 import uuid
 
+from flask_socketio import join_room
+
 connectedUsers = []
 typingUsers = []
 
 def joinControl(socket, data):
     data['user']['sid'] = request.sid
-    isUserInList = False
     for item in connectedUsers:
-        if item['user']['sid'] == request.sid:
-            isUserInList = True
-            break
-    if not isUserInList:
-        connectedUsers.append(data)
+        if item['user']['_id'] == data['user']['_id']:
+            socket.emit('forceDisconnect', room=item['user']['sid'])
+    connectedUsers.append(data)
+    join_room(request.sid)
     message = {"type": "broadcast", "roomId": data['roomId'], "key": str(uuid.uuid4()), "sender": "system", "content": f"{data['user']['username']} entrou no chat!"}
     socket.emit('broadcastMessage', message, broadcast=True)
     socket.emit('broadcastUserList', connectedUsers, broadcast=True)
@@ -43,7 +43,6 @@ def exitControl(socket):
         if item['user']['sid'] == request.sid:
             data = item
             connectedUsers.remove(item)
-            break
     if data:
         message = {"type": "broadcast", "roomId": data['roomId'], "key": str(uuid.uuid4()), "sender": "system", "content": f"{data['user']['username']} saiu do chat!"}
         socket.emit('broadcastMessage', message, broadcast=True)

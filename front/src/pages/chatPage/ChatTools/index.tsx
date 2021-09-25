@@ -9,9 +9,10 @@ interface ChatToolsProps {
   sendTyping: (data: ChatTyping) => void;
   roomId: string;
   user?: User;
+  socketId: string;
 }
 
-const ChatTools = ({ sendMessage, sendTyping, roomId, user }: ChatToolsProps): JSX.Element => {
+const ChatTools = ({ sendMessage, sendTyping, roomId, user, socketId }: ChatToolsProps): JSX.Element => {
   const [content, setContent] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
@@ -63,10 +64,11 @@ const ChatTools = ({ sendMessage, sendTyping, roomId, user }: ChatToolsProps): J
           onClick={() => {
             sendMessage({
               type: 'message',
-              roomId: roomId,
+              roomId,
               sender: user?.username ?? 'Desconhecido',
               content: content,
               key: uuidv4(),
+              socketId,
             });
             handleResetChatInput();
           }}
