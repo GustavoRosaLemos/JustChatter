@@ -48,7 +48,7 @@ const chatPage = (): JSX.Element => {
   }, [socket]);
 
   const handleSendMessage = (message: ChatMessage) => {
-    if (socket) {
+    if (socket && socket.connected) {
       if (message.content !== '') {
         socket.emit('chatMessage', message);
       }
@@ -60,7 +60,7 @@ const chatPage = (): JSX.Element => {
   };
 
   const handleSendTyping = (data: ChatTyping) => {
-    if (socket) {
+    if (socket && socket.connected) {
       socket.emit('Typing', data);
     } else {
       sendError('Falha ao conectar com o chat!');
@@ -101,7 +101,7 @@ const chatPage = (): JSX.Element => {
         setConnectedUsers(userList);
       });
       socket.on('forceDisconnect', () => {
-        sendInfo('Você foi desconectado do chat, pois já está conectado em outra aba!');
+        sendInfo('Você foi desconectado do chat, houve uma nova conexão em outra aba!');
         history.push('/');
         socket.disconnect();
       });
