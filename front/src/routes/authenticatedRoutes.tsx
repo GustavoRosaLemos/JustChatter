@@ -18,7 +18,6 @@ const AuthenticatedRoutes = (): JSX.Element => {
     const token = getSessionParam('token');
     if (!token) {
       history.push('/login');
-      sendInfo('Sessão inválida, por favor realiza o login!');
     } else {
       try {
         await requestTokenValidation(token);
