@@ -6,9 +6,11 @@ import os
 
 def loadChatRoutes(app) -> None:
     @app.route(f"{os.getenv('API_URL')}/chat/room/<string:id>", methods=['GET'])
+    @tokenRequired
     def roomRoute(id): return findChatRoom(id)
 
     @app.route(f"{os.getenv('API_URL')}/chat/rooms", methods=['GET'])
+    @tokenRequired
     def roomsRoute(): return findChatRooms()
 
 def loadChatSockets(socket) -> None:
