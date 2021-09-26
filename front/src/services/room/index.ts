@@ -5,14 +5,14 @@ config();
 
 export const requestRoomData = async (roomId: string) => {
   const url = `${process.env.REACT_APP_API_URL}/chat/room/${roomId}`;
-  const headers = { 'content-type': 'application/json' };
+  const headers = { 'content-type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` };
   const response = await requestService(url, {}, headers, 'GET');
   return response.content;
 };
 
 export const requestRoomsData = async () => {
   const url = `${process.env.REACT_APP_API_URL}/chat/rooms`;
-  const headers = { 'content-type': 'application/json' };
+  const headers = { 'content-type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` };
   const response = await requestService(url, {}, headers, 'GET');
   return response.content;
 };
