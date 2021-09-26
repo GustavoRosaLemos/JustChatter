@@ -12,7 +12,7 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 CORS(app)
-socket = SocketIO(app, cors_allowed_origins='*', TIMEOUT_MAX=1000)
+socket = SocketIO(app, cors_allowed_origins='*', ping_timeout=10, ping_interval=5)
 
 loadChatRoutes(app)
 loadChatSockets(socket)
