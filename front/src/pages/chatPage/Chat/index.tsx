@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Col } from 'react-bootstrap';
 import { ChatMessage, ChatTyping } from '../../../shared/@types/chat';
 import './styles.scss';
@@ -10,9 +10,22 @@ interface ChatProps {
 }
 
 const Chat = ({ messages, typingUsers, socketId }: ChatProps): JSX.Element => {
+  const handleScrollBottom = () => {
+    const messageBox = document?.getElementById('chatBox');
+    if (messageBox) {
+      const scrollHeight = messageBox.scrollHeight;
+      const height = messageBox.clientHeight;
+      const maxScrollTop = scrollHeight - height;
+      messageBox.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
+    }
+  };
+
+  useEffect(() => {
+    handleScrollBottom();
+  }, [messages, handleScrollBottom]);
   return (
     <Col className="m-2" style={{ height: '100%' }}>
-      <Col style={{ overflowY: 'scroll', wordWrap: 'break-word', height: '97%' }}>
+      <Col id="chatBox" style={{ overflowY: 'scroll', wordWrap: 'break-word', height: '97%' }}>
         {messages &&
           messages.map((message) =>
             message.type === 'message' ? (

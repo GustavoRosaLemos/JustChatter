@@ -1,3 +1,4 @@
+from threading import TIMEOUT_MAX
 from routes.auth.auth import loadAuthRoutes
 from routes.chat.chat import loadChatSockets, loadChatRoutes
 from flask import Flask, app, request
@@ -11,7 +12,7 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 CORS(app)
-socket = SocketIO(app, cors_allowed_origins='*')
+socket = SocketIO(app, cors_allowed_origins='*', TIMEOUT_MAX=1000)
 
 loadChatRoutes(app)
 loadChatSockets(socket)
